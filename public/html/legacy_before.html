@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legacy_before</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src='/socket.io/socket.io.js'></script>
+</head>
+<body>
+
+    <h1>기차표 예매하기</h1>
+    <p>
+        <button id="connect">예매하기</button>
+        <!--button id="disconnect" disabled>Disconnect</button>-->
+    </p>
+    
+    <br><br><br>
+
+    <div class="w3-container">
+        <div id="id01" class="w3-modal">
+          <div class="w3-modal-content">
+            <div class="w3-container">
+              <p><span id="caution_txt"></span></p>
+              <p>전체 대기자 수 : <span id="message"></span></p>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+</body>
+<script>
+
+    var socket;
+    var socket_id;
+    const socketUrl = 'http://localhost:3000';
+    const connectButton = document.getElementById('connect');
+    const disconnectButton = document.getElementById('disconnect');
+    let my_turn;
+
+    let cnt = 0;
+    
+    myVar = setInterval(showtxt, 800);
+    function showtxt(){
+        cnt = cnt + 1;
+        if(cnt%5===1)
+            $('#caution_txt').text("새로 고침 하지 마세요!  ");
+        else if(cnt%5===2)
+            $('#caution_txt').text("새로 고침 하지 마세요!  >");
+        else if(cnt%5===3)
+            $('#caution_txt').text("새로 고침 하지 마세요!  > >");
+        else if(cnt%5===4)
+            $('#caution_txt').text("새로 고침 하지 마세요!  > > >");
+        else if(cnt%5===0)
+            $('#caution_txt').text("새로 고침 하지 마세요!  > > > >");
+    }
+
+    $("#disconnect").click(function(){
+        socket.disconnect();
+    });
+
+    $("#connect").click(function(){
+
+        var param = {};
+        param.sid = socket_id;
+
+        $.ajax({
+            type: 'POST',
+            url: '/auth',
+            data: JSON.stringify(param),
+            contentType: 'application/json; charset=utf-8',
+            cache: false,
+            success: function (response) {
+                /*
+                var jsonObject = JSON.parse(response);
+                if(jsonObject === "success"){
+                    location.replace('/target');
+                } else
+                */
+            },  
+            error: function (response) {
+                console.log("errer:" + response.status);  
+            }
+        });
+
+        socket = io(socketUrl, {
+            autoConnect: false,
+        });
+
+        socket.on('connect', function(){
+            console.log('Connected');
+            connectButton.disabled = true;
+            disconnectButton.disabled = false;
+        });
+
+        socket.on('init', function(id, msg){
+            //console.log(id);
+            socket_id = id;
+            $('#message').text(msg);
+            //my_turn = $('#message').text();
+        });
+
+        socket.on('move', function(){
+            clearTimeout(myVar);
+            location.replace('/target');
+        });
+
+        socket.on('wait', function(){
+            document.getElementById('id01').style.display='block';
+            my_turn = $('#message').text();
+            //발생할 때 마다 -1 감소
+            my_turn = my_turn - 1;
+            $('#message').text(my_turn);
+        });
+
+        socket.on('disconnect', function(reason) {
+            console.log('Disconnected');
+            connectButton.disabled = false;
+            disconnectButton.disabled = true;
+        })
+
+        socket.open();
+
+    });
+
+</script>
+</html>

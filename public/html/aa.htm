@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src='/socket.io/socket.io.js'></script>
+    <title>target system</title>
+</head>
+<body>
+
+    <h2>기존 시스템 예약 페이지</h2>
+    ■ 남은 시간 : <span id="remain_time">120</span>
+    <p><button id="btn_request">Go to Book</button></p>
+    
+    <script>
+
+        var socket = io("http://localhost:3000");
+
+        var try_count = 0;
+
+        var remain_time = $('#remain_time').text();
+        var timer = setInterval(function(){
+            remain_time = remain_time - 1;
+            if(remain_time>0){
+                $('#remain_time').text(remain_time);
+            } else {
+                //Go to Initial Default page
+                location.replace('/');
+            }
+        }, 1000)
+
+        $("#btn_request").click(function(){
+            try_count = try_count + 1;
+            if(try_count>3){
+                clearInterval(timer);
+                //Go to Initial Default page
+                location.replace('/');
+            }
+        });
+
+    </script>
+
+</body>
+</html>
