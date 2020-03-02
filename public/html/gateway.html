@@ -3,17 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legacy_before</title>
+    <title>Legacy</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src='/socket.io/socket.io.js'></script>
 </head>
 <body>
 
-    <h1>기차표 예매하기</h1>
+    <h1>기차표 예매 Gateway</h1>
     <p>
-        <button id="connect">예매하기</button>
-        <!--button id="disconnect" disabled>Disconnect</button>-->
+        <button id="connect">예매 하러 가기</button>
     </p>
     
     <br><br><br>
@@ -33,10 +32,8 @@
 <script>
 
     var socket;
-    var socket_id;
     const socketUrl = 'http://localhost:3000';
     const connectButton = document.getElementById('connect');
-    const disconnectButton = document.getElementById('disconnect');
     let my_turn;
 
     let cnt = 0;
@@ -62,22 +59,12 @@
 
     $("#connect").click(function(){
 
-        var param = {};
-        param.sid = socket_id;
-
         $.ajax({
             type: 'POST',
             url: '/auth',
-            data: JSON.stringify(param),
             contentType: 'application/json; charset=utf-8',
             cache: false,
             success: function (response) {
-                /*
-                var jsonObject = JSON.parse(response);
-                if(jsonObject === "success"){
-                    location.replace('/target');
-                } else
-                */
             },  
             error: function (response) {
                 console.log("errer:" + response.status);  
@@ -89,19 +76,15 @@
         });
 
         socket.on('connect', function(){
-            console.log('Connected');
+            //console.log('Connected');
             connectButton.disabled = true;
-            disconnectButton.disabled = false;
         });
 
-        socket.on('init', function(id, msg){
-            //console.log(id);
-            socket_id = id;
+        socket.on('init', function(msg){
             $('#message').text(msg);
-            //my_turn = $('#message').text();
         });
 
-        socket.on('move', function(){
+        socket.on('redirect', function(){
             clearTimeout(myVar);
             location.replace('/target');
         });
@@ -109,19 +92,16 @@
         socket.on('wait', function(){
             document.getElementById('id01').style.display='block';
             my_turn = $('#message').text();
-            //발생할 때 마다 -1 감소
             my_turn = my_turn - 1;
             $('#message').text(my_turn);
         });
 
         socket.on('disconnect', function(reason) {
-            console.log('Disconnected');
+            //console.log('Disconnected');
             connectButton.disabled = false;
-            disconnectButton.disabled = true;
         })
 
         socket.open();
-
     });
 
 </script>

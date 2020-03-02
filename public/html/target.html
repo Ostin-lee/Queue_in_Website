@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src='/socket.io/socket.io.js'></script>
-    <title>target system</title>
+    <title>Target System</title>
 </head>
 <body>
 
-    <h2>기존 시스템 예약 페이지</h2>
+    <h2>타켓 시스템 예약 사이트</h2>
     ■ 남은 시간 : <span id="remain_time">120</span>
-    <p><button id="btn_request">Go to Book</button></p>
+    <p><button id="btn_request">예약 하기</button></p>
     
     <script>
 
         $.ajax({
             type: 'POST',
-            url: '/logout',
-            //data: JSON.stringify(param),
+            url: '/session_close',
             contentType: 'application/json; charset=utf-8',
             cache: false,
             success: function (response) {
@@ -38,7 +37,6 @@
             if(remain_time>0){
                 $('#remain_time').text(remain_time);
             } else {
-                //Go to Initial Default page
                 location.replace('/');
             }
         }, 1000)
@@ -47,7 +45,6 @@
             try_count = try_count + 1;
             if(try_count>3){
                 clearInterval(timer);
-                //Go to Initial Default page
                 location.replace('/');
             }
         });
