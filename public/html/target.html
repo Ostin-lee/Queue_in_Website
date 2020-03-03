@@ -10,26 +10,18 @@
 <body>
 
     <h2>타켓 시스템 예약 사이트</h2>
-    ■ 남은 시간 : <span id="remain_time">120</span>
+    ■ 남은 시간 : <span id="remain_time">120</span>(s)
     <p><button id="btn_request">예약 하기</button></p>
     
     <script>
 
-        $.ajax({
-            type: 'POST',
-            url: '/session_close',
-            contentType: 'application/json; charset=utf-8',
-            cache: false,
-            success: function (response) {
-            },  
-            error: function (response) {
-                console.log("errer:" + response.status);  
-            }
-        });
-
         var socket = io("http://localhost:3000");
 
         var try_count = 0;
+
+        socket.on('unauthorized', function(msg){
+            location.replace('/');
+        });
 
         var remain_time = $('#remain_time').text();
         var timer = setInterval(function(){

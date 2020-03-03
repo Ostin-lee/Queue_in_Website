@@ -53,23 +53,7 @@
             $('#caution_txt').text("새로 고침 하지 마세요!  > > > >");
     }
 
-    $("#disconnect").click(function(){
-        socket.disconnect();
-    });
-
     $("#connect").click(function(){
-
-        $.ajax({
-            type: 'POST',
-            url: '/auth',
-            contentType: 'application/json; charset=utf-8',
-            cache: false,
-            success: function (response) {
-            },  
-            error: function (response) {
-                console.log("errer:" + response.status);  
-            }
-        });
 
         socket = io(socketUrl, {
             autoConnect: false,
@@ -84,7 +68,7 @@
             $('#message').text(msg);
         });
 
-        socket.on('redirect', function(){
+        socket.on('forward', function(){
             clearTimeout(myVar);
             location.replace('/target');
         });
